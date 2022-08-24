@@ -1,38 +1,77 @@
-.App {
-  text-align: center;
+#chat {
+    height: 500px;
+    overflow: auto;
+    font-size: 16px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.container > .jumbotron {
+    height: 120px;
+    padding: 1.5% 1% 5% 1%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.content {
+    box-sizing: border-box;
+    overflow: auto;
+    height: 85%;
+    margin: 1% 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* msg */
+
+.msg {
+    padding: 1%;
+    margin: 1%;
+    border: 1px solid var(--blue);
+    border-radius: 3px;
+    color: var(--dark);
+    width: fit-content;
+    max-width: 80%;
 }
 
-.App-link {
-  color: #61dafb;
+.msg .head {
+    width: 100%;
+    color: var(--indigo);
+    font-weight: 350;
+    font-style: italic;
+    font-size: 12px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.msg .body {
+    margin: 1% 0;
+    font-size: 16px;
+}
+
+.msg .footer {
+    color: gray;
+    font-size: 12px;
+}
+
+/* tools */
+
+.tools {
+    position: relative;
+}
+
+p.typing {
+    position: absolute;
+    top: -24px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.tools .emoji-list {
+    display: none;
+    flex-wrap: wrap;
+    position: absolute;
+    right: 2%;
+    bottom: 110%;
+    border-radius: 5px;
+    border: 1px solid gray;
+    width: 270px;
+    height: 150px;
+    overflow: auto;
+}
+
+.tools .emoji-list .emoji {
+    margin: 1%;
 }

@@ -1,89 +1,87 @@
-import {createMachine} from 'xstate';
+import {createMachine, assign} from 'xstate';
 
-const chatMachine = createMachine({
-	"id": "ChatMachine",
-	"initial": "init",
-	"states": {
-		"init": {
-			"on": {
-				"initialise": {
-					"target": "initialised"
-				}
-			}
-		},
-		"initialised": {
-			"on": {
-				"reply": {
-					"target": "replyChat"
-				},
-				"chat": {
-					"target": "activeChat"
-				},
-				"forward": {
-					"target": "forwardChat"
-				},
-			}
-		},
-		"replyChat": {
-			"on": {
-				"startThread": {
-					"target": "activeChat"
-				}
-			}
-		},
-		"newChat": {
-			"on": {
-				"startTyping": {
-					"target": "typing"
-				},
-				"endTyping": {
-					"target": "sendMessage"
-				}
-			}
-		},
-		"typing": {
-			always: [
-				{
-					target: '',
-					cond: 'getMessage'
-				},
-				{
-					target: 'loading'
-				}
-			]
-		},
-		'loading': {},
-		"activeChat": {
-			"on": {
-				"startReplyChat": {
-					"target": "replyChat"
-				},
-				"startForwardChat": {
-					"target": "forwardChat"
-				},
-				"startNewChat": {
-					"target": "newChat"
-				},
-				"endChat": {
-					"target": "end"
-				}
-			}
-		},
-		"forwardChat": {
-			"on": {
-				"endChat": {
-					"target": "end"
-				}
-			}
-		},
-		"end": {
-			type: 'final'
-		}
-	}
-}, {
-	guards: {
-		getMessage: (context)=>{
-			return !!context.message
-		}
-	}
-});
+const messagesMachine = createMachine(
+    {
+        context: {
+            messages: [],
+            createNewTodoFormInput: "",
+        },
+        id: "Chat machine",
+        initial: "LOADING_MESSAGES",
+        states: {
+            "LOADING_MESSAGES": {
+                invoke: {
+                    src: "loadMessages",
+                    onDone: [
+                        {
+                            actions: "assignMessagesToContext",
+                            cond: "Has messages",
+                            target: "Messages Loaded",
+                        },
+                        {
+                            target: "Creating new message",
+                        },
+                    ],
+                },
+            },
+            "Messages Loaded": {
+                on: {
+                    "Create new": {
+                        target: "Creating new message",
+                    },
+                },
+            },
+            "Loading messages errored": {},
+            "Creating new message": {
+                initial: "Showing form input",
+                states: {
+                    "Showing form input": {
+                        on: {
+                            "Form input changed": {
+                                actions: "assignFormInputToContext",
+                            },
+                            Submit: {
+                                target: "Saving message",
+                            },
+                        },
+                    },
+                    "Saving message": {
+                        invoke: {
+                            src: "saveMessage",
+                            onDone: [
+                                {
+                                    target: "#Chat machine.LOADING_MESSAGES",
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        },
+    },
+    {
+        guards: {
+            "Has messages": (context, event) => {
+                return event.data.length > 0;
+            },
+        },
+        actions: {
+            assignMessagesToContext: assign((context, event) => {
+                return {
+                    messages: event.data,
+                };
+            }),
+            assignErrorToContext: assign((context, event) => {
+                return {
+                    errorMessage: (event.data).message,
+                };
+            }),
+            assignFormInputToContext: assign((context, event) => {
+                return {
+                    createNewTodoFormInput: event.value,
+                };
+            }),
+        },
+    },
+);
+export default messagesMachine
