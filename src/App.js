@@ -2,6 +2,8 @@ import './App.css';
 import {useEffect, useState} from "react";
 import {useMachine} from '@xstate/react';
 import messagesMachine from "./machines/chat";
+import { createMachine, interpret } from 'xstate';
+
 
 const messages = [];
 

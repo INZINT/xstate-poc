@@ -1,4 +1,4 @@
-import {createMachine, assign} from 'xstate';
+import { createMachine, assign, interpret } from "xstate";
 
 const messagesMachine = createMachine(
     {
@@ -9,7 +9,7 @@ const messagesMachine = createMachine(
         id: "Chat machine",
         initial: "LOADING_MESSAGES",
         states: {
-            "LOADING_MESSAGES": {
+            LOADING_MESSAGES: {
                 invoke: {
                     src: "loadMessages",
                     onDone: [
@@ -73,7 +73,7 @@ const messagesMachine = createMachine(
             }),
             assignErrorToContext: assign((context, event) => {
                 return {
-                    errorMessage: (event.data).message,
+                    errorMessage: event.data.message,
                 };
             }),
             assignFormInputToContext: assign((context, event) => {
@@ -82,6 +82,16 @@ const messagesMachine = createMachine(
                 };
             }),
         },
-    },
+    }
 );
-export default messagesMachine
+const service = interpret(messagesMachine).onTransition((state) => {
+    console.log(state.value);
+});
+service.start();
+
+// Send events
+service.send({ type: "initialise" });
+
+// // Stop the service when you are no longer using it.
+// service.stop();
+export default messagesMachine;
